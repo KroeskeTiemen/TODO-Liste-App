@@ -1,0 +1,277 @@
+openapi: 3.0.1
+info:
+  title: Todo-Listen-Verwaltung
+  version: 0.1.0
+  description: API zur Verwaltung von Todo-Listen und -Einträgen.
+servers:
+  - url: http://127.0.0.1:5000/
+
+tags:
+  - name: Listenverwaltung
+  - name: Eintragsverwaltung
+
+paths:
+  /todo-list/{list_id}:
+    get:
+      tags:
+        - Listenverwaltung
+      summary: Liefert alle Einträge einer Todo-Liste zurück
+      parameters:
+        - name: list_id
+          in: path
+          required: true
+          description: ID der gewünschten Todo-Liste
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Erfolgreicher Abruf - Liste aller Einträge
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TodoEntry'
+        '404':
+          description: Liste nicht gefunden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        '500':
+          description: Serverfehler
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+
+    delete:
+      tags:
+        - Listenverwaltung
+      summary: Löscht eine komplette Todo-Liste
+      parameters:
+        - name: list_id
+          in: path
+          required: true
+          description: ID der Liste
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Erfolgreich gelöscht
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '404':
+          description: Liste nicht gefunden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        '500':
+          description: Serverfehler
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+
+  /todo-list:
+    post:
+      tags:
+        - Listenverwaltung
+      summary: Fügt eine neue Todo-Liste hinzu
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+      responses:
+        '201':
+          description: Liste erfolgreich angelegt
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TodoList'
+        '406':
+          description: Fehlerhafte Daten im Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TodoList'
+        '500':
+          description: Serverfehler
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+
+  /todo-list/{list_id}/entry:
+    post:
+      tags:
+        - Eintragsverwaltung
+      summary: Fügt einen Eintrag zu einer bestehenden Liste hinzu
+      parameters:
+        - name: list_id
+          in: path
+          required: true
+          description: ID der Liste
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - description
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+      responses:
+        '201':
+          description: Eintrag erfolgreich angelegt
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TodoEntry'
+        '404':
+          description: Liste nicht gefunden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        '500':
+          description: Serverfehler
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+
+  /entry/{entry_id}:
+    patch:
+      tags:
+        - Eintragsverwaltung
+      summary: Aktualisiert einen bestehenden Eintrag
+      parameters:
+        - name: entry_id
+          in: path
+          required: true
+          description: ID des Eintrags
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+      responses:
+        '200':
+          description: Eintrag erfolgreich aktualisiert
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TodoEntry'
+        '404':
+          description: Eintrag nicht gefunden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        '406':
+          description: Fehlerhafte Daten
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        '500':
+          description: Fehlerhafte Server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        
+
+    delete:
+      tags:
+        - Eintragsverwaltung
+      summary: Löscht einen einzelnen Eintrag
+      parameters:
+        - name: entry_id
+          in: path
+          required: true
+          description: ID des Eintrags
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Eintrag erfolgreich gelöscht
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '404':
+          description: Eintrag nicht gefunden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        '500':
+          description: Serverfehler
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+
+components:
+  schemas:
+    TodoList:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+
+    TodoEntry:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        list_id:
+          type: string
+          format: uuid
+
+    Message:
+      type: object
+      properties:
+        message:
+          type: string
+
+    ErrorMessage:
+      type: object
+      properties:
+        message:
+          type: string
