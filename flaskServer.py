@@ -39,5 +39,23 @@ def get_entries(list_id):
     
     return jsonify(entries), 200
 
+@app.route("/todo-list/<list_id>/entry", methods=["POST"])
+def add_entry(list_id):
+    if list_id not in todo_lists:
+        return error("List not found", 404)
+
+    data = request.get_json()
+    if "name" not in data or "description" not in data:
+        return error("Invalid input", 406)
+
+    entry_id = create_uuid()
+    entry = {
+        "id": entry_id,
+        "name": data["name"],
+        "description": data["description"],
+        "list_id": list_id
+    }
+    todo_entries[entry_id] = entry
+    return jsonify(entry), 201
 
 app.run(debug=True)
