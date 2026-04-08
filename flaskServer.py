@@ -28,4 +28,16 @@ def create_list():
     }
     return jsonify(todo_lists[list_id]), 201
 
+
+@app.route("/todo-list/<list_id>", methods=["GET"])
+def get_entries(list_id):
+    if list_id not in todo_lists:
+        return error("List not found", 404)
+
+    entries = [entry for entry in todo_entries.values()
+                if entry["list_id"] == list_id]
+    
+    return jsonify(entries), 200
+
+
 app.run(debug=True)
