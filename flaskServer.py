@@ -84,4 +84,13 @@ def delete_entry(entry_id):
     del todo_entries[entry_id]
     return jsonify({"message": "Entry deleted"}), 204
 
+#Delete List Method
+@app.route("/todo-list/<list_id>", methods=["DELETE"])
+def delete_list(list_id):
+    if list_id not in todo_lists:
+        return error("List not found", 404)
+
+    del todo_lists[list_id]
+    return jsonify({"message": "Entry deleted"}), 204
+
 app.run(debug=True)
