@@ -28,7 +28,7 @@ def create_list():
     }
     return jsonify(todo_lists[list_id]), 201
 
-
+#Get List entries Method
 @app.route("/todo-list/<list_id>", methods=["GET"])
 def get_entries(list_id):
     if list_id not in todo_lists:
@@ -39,6 +39,7 @@ def get_entries(list_id):
     
     return jsonify(entries), 200
 
+#Add Entry Method
 @app.route("/todo-list/<list_id>/entry", methods=["POST"])
 def add_entry(list_id):
     if list_id not in todo_lists:
@@ -57,5 +58,21 @@ def add_entry(list_id):
     }
     todo_entries[entry_id] = entry
     return jsonify(entry), 201
+
+#Change Entry Method
+@app.route("/entry/<entry_id>", methods=["PATCH"])
+def update_entry(entry_id):
+    if entry_id not in todo_entries:
+        return error("Entry not found", 404)
+
+    data = request.get_json()
+    entry = todo_entries[entry_id]
+
+    if "name" in data:
+        entry["name"] = data["name"]
+    if "description" in data:
+        entry["description"] = data["description"]
+
+    return jsonify(entry), 200
 
 app.run(debug=True)
