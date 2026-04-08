@@ -39,6 +39,12 @@ def get_entries(list_id):
     
     return jsonify(entries), 200
 
+# Get All Lists Method
+@app.route("/todo-list", methods=["GET"])
+def get_all_lists():
+    return jsonify(list(todo_lists.values())), 200
+
+
 #Add Entry Method
 @app.route("/todo-list/<list_id>/entry", methods=["POST"])
 def add_entry(list_id):

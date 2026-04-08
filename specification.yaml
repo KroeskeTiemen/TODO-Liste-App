@@ -77,6 +77,26 @@ paths:
                 $ref: '#/components/schemas/ErrorMessage'
 
   /todo-list:
+    get:
+      tags:
+        - Listenverwaltung
+      summary: Liefert alle vorhandenen Todo-Listen zurück
+      responses:
+        '200':
+          description: Erfolgreicher Abruf aller Todo-Listen
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TodoList'
+        '500':
+          description: Serverfehler
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+
     post:
       tags:
         - Listenverwaltung
@@ -111,53 +131,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorMessage'
-
-  /todo-list/{list_id}/entry:
-    post:
-      tags:
-        - Eintragsverwaltung
-      summary: Fügt einen Eintrag zu einer bestehenden Liste hinzu
-      parameters:
-        - name: list_id
-          in: path
-          required: true
-          description: ID der Liste
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - name
-                - description
-              properties:
-                name:
-                  type: string
-                description:
-                  type: string
-      responses:
-        '201':
-          description: Eintrag erfolgreich angelegt
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TodoEntry'
-        '404':
-          description: Liste nicht gefunden
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorMessage'
-        '500':
-          description: Serverfehler
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorMessage'
-
+                
   /entry/{entry_id}:
     patch:
       tags:
