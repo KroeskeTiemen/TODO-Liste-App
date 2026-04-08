@@ -75,4 +75,13 @@ def update_entry(entry_id):
 
     return jsonify(entry), 200
 
+#Delete Entry Method
+@app.route("/entry/<entry_id>", methods=["DELETE"])
+def delete_entry(entry_id):
+    if entry_id not in todo_entries:
+        return error("Entry not found", 404)
+
+    del todo_entries[entry_id]
+    return jsonify({"message": "Entry deleted"}), 204
+
 app.run(debug=True)
