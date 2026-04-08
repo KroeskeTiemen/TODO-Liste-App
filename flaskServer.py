@@ -6,11 +6,11 @@ todo_entries = {}
 
 app = Flask(__name__)
 
-# UUID generator Fuer IDs
+# UUID generator for IDs
 def create_uuid():
     return str(uuid.uuid4())
 
-# Fehlerantwort
+# Error message
 def error(message, code):
     return jsonify({"message": message}), code
 
