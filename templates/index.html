@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Todo Lists</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+        .list {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 25px;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 6px;
+        }
+        input {
+            margin-right: 5px;
+        }
+        button {
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Todo Lists</h1>
+
+<h2>Create new list</h2>
+<form method="post" action="/create-list">
+    <input type="text" name="name" placeholder="List name" required>
+    <button type="submit">Create</button>
+</form>
+
+<hr>
+
+{% for list in lists %}
+<div class="list">
+    <h2>
+        {{ list.name }}
+        <a href="/delete-list/{{ list.id }}">[delete list]</a>
+    </h2>
+
+    <form method="post" action="/add-entry/{{ list.id }}">
+        <input type="text" name="name" placeholder="Entry name" required>
+        <input type="text" name="description" placeholder="Description" required>
+        <button type="submit">Add entry</button>
+    </form>
+
+    <ul>
+        {% for entry in list.entries %}
+            <li>
+                <strong>{{ entry.name }}</strong>
+                – {{ entry.description }}
+                <a href="/delete-entry/{{ entry.id }}">[x]</a>
+            </li>
+        {% else %}
+            <li><em>No entries yet</em></li>
+        {% endfor %}
+    </ul>
+</div>
+{% endfor %}
+
+</body>
+</html>
