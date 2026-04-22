@@ -14,6 +14,14 @@ def create_uuid():
 def error(message, code):
     return jsonify({"message": message}), code
 
+# add some headers to allow cross origin access to the API on this server, necessary for using preview in Swagger Editor!
+@app.after_request
+def apply_cors_header(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'GET,POST,DELETE,PATCH'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+    return response
+
 #Add List Method
 @app.route("/todo-list", methods=["POST"])
 def create_list():
