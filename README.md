@@ -400,3 +400,31 @@ Danach erreichbar:
 - **Client (HTML):** http://192.168.24.103:5001
 - **API:** http://192.168.24.103:5000
 
+---
+
+## BONUSAUFGABEN
+
+---
+
+## 9. Firewall einrichten (ufw)
+
+Richtet eine Firewall nach dem Whitelist-Prinzip ein: alles eingehende wird blockiert, nur die notwendigen Ports werden explizit erlaubt. So ist der Pi von außen nur über SSH und die Webapp-Ports erreichbar.
+
+> **Hinweis:** Port 22 (SSH) **unbedingt vor** `ufw enable` freigeben – sonst sperrt man sich selbst aus. Docker verwaltet teilweise eigene iptables-Regeln, aber für eingehende Verbindungen von außen reicht diese Konfiguration.
+
+```bash
+sudo apt install ufw
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+
+sudo ufw allow 22      # ssh
+sudo ufw allow 5000    # Flask API Port
+sudo ufw allow 5001    # Flask Client (HTML) Port
+
+# Firewall aktivieren
+sudo ufw enable
+
+# Status prüfen
+sudo ufw status verbose
+```
+
