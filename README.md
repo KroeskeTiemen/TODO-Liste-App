@@ -4,6 +4,10 @@
 
 ## 1. Statische IP setzen
 
+Setzt eine feste IP-Adresse für den Raspberry Pi, damit er immer unter derselben Adresse erreichbar ist. Ohne statische IP kann sich die Adresse nach jedem Neustart ändern.
+
+> **Hinweis:** Den Verbindungsnamen (`netplan-eth0`) ggf. mit `nmcli connection show` prüfen und anpassen.
+
 ```bash
 sudo nmcli connection modify "netplan-eth0" \
   ipv4.addresses 192.168.24.103/24 \
@@ -17,6 +21,10 @@ Danach Pi neu starten (aus und an).
 ---
 
 ## 2. Users erstellen
+
+Erstellt zwei Benutzer: `willi` als normalen Benutzer und `fernzugriff` als Admin-Benutzer für den SSH-Zugang. Der `fernzugriff`-User wird der Gruppe `sudo` hinzugefügt, damit er administrative Befehle ausführen darf.
+
+> **Hinweis:** Das Passwort wird nach `passwd` interaktiv abgefragt – es erscheint kein Echo beim Tippen.
 
 **Willi:**
 ```bash
@@ -33,6 +41,10 @@ sudo usermod -aG sudo fernzugriff
 ---
 
 ## 3. SSH aktivieren
+
+Aktiviert den SSH-Dienst, damit der Pi von einem anderen Rechner aus ferngesteuert werden kann. Die Konfiguration schränkt den Zugriff auf den `fernzugriff`-User ein und deaktiviert den direkten Root-Login aus Sicherheitsgründen.
+
+> **Hinweis:** Nach der Konfigurationsänderung muss SSH neugestartet werden, damit die Änderungen wirksam werden.
 
 ```bash
 sudo systemctl enable ssh
@@ -60,6 +72,10 @@ sudo systemctl restart ssh
 
 ## 4. Datum setzen (muss öfters gemacht werden)
 
+Setzt die Systemzeit manuell, da der Pi ohne Netzwerkzugang oder bei fehlendem RTC-Modul die Zeit nach einem Neustart verliert. Ein falsches Datum kann zu Problemen bei HTTPS-Verbindungen und Logs führen.
+
+> **Hinweis:** Datum und Uhrzeit entsprechend dem aktuellen Zeitpunkt anpassen.
+
 ```bash
 sudo date -s "2026-05-27 12:10:00"
 ```
@@ -67,6 +83,10 @@ sudo date -s "2026-05-27 12:10:00"
 ---
 
 ## 5. System updaten + Docker installieren
+
+Aktualisiert die Paketlisten und installiert Docker sowie das Compose-Plugin, mit dem später die Container gestartet werden. Mit `hello-world` wird geprüft, ob Docker korrekt funktioniert.
+
+> **Hinweis:** `sudo apt update` lädt nur die Paketlisten herunter – zum eigentlichen Aktualisieren wäre `sudo apt upgrade` nötig.
 
 ```bash
 sudo apt update
@@ -80,6 +100,10 @@ sudo apt install docker-compose-plugin
 
 ## 6. Webapp-Ordner erstellen
 
+Erstellt die Ordnerstruktur für das Projekt. Der Ordner `templates` wird von Flask benötigt, um HTML-Dateien zu finden.
+
+> **Hinweis:** Alle folgenden Dateien müssen im `webapp`-Ordner angelegt werden.
+
 ```bash
 mkdir webapp
 cd webapp
@@ -90,7 +114,12 @@ mkdir templates
 
 ## 7. Dateien erstellen
 
+Legt alle notwendigen Projektdateien an. Die Inhalte können direkt aus diesem README kopiert werden.
+
 ### flaskServer.py
+
+Das Backend der Webapp – eine Flask-REST-API, die Todo-Listen und Einträge im Arbeitsspeicher verwaltet. Läuft auf Port `5000`.
+
 ```bash
 nano flaskServer.py
 ```
@@ -181,6 +210,11 @@ if __name__ == "__main__":
 ---
 
 ### client.py
+
+Das Frontend der Webapp – eine Flask-App, die HTML-Seiten rendert und intern mit der API kommuniziert. Läuft auf Port `5001`.
+
+> **Hinweis:** Die Adresse der API wird über die Umgebungsvariable `API_BASE` gesetzt, standardmäßig `http://192.168.24.103:5000`.
+
 ```bash
 nano client.py
 ```
@@ -230,6 +264,9 @@ if __name__ == "__main__":
 ---
 
 ### templates/index.html
+
+Die HTML-Seite, die der Client-Server ausliefert. Zeigt alle Todo-Listen und Einträge an und erlaubt das Erstellen und Löschen über Formulare.
+
 ```bash
 nano templates/index.html
 ```
@@ -280,6 +317,9 @@ nano templates/index.html
 ---
 
 ### Dockerfile
+
+Definiert das Docker-Image für den API-Server. Installiert Flask und kopiert die Serverdateien ins Image.
+
 ```bash
 nano Dockerfile
 ```
@@ -296,6 +336,9 @@ CMD ["python", "flaskServer.py"]
 ---
 
 ### Dockerfile.client
+
+Definiert das Docker-Image für den Client-Server. Installiert Flask und `requests`, da der Client HTTP-Anfragen an die API schickt.
+
 ```bash
 nano Dockerfile.client
 ```
@@ -312,6 +355,11 @@ CMD ["python", "client.py"]
 ---
 
 ### docker-compose.yml
+
+Orchestiert beide Container gemeinsam. Der Client-Container wartet auf den API-Container (`depends_on`) und kommuniziert mit ihm über den internen Docker-Netzwerknamen `api`.
+
+> **Hinweis:** Dank `API_BASE=http://api:5000` muss keine IP-Adresse hart codiert werden.
+
 ```bash
 nano docker-compose.yml
 ```
@@ -339,6 +387,10 @@ services:
 ---
 
 ## 8. Container starten
+
+Baut die Docker-Images aus den Dockerfiles und startet beide Container. Beim ersten Start kann es etwas dauern, da die Images gebaut werden.
+
+> **Hinweis:** Mit `sudo docker compose up --build` wird das Image bei Änderungen neu gebaut. Mit `Strg+C` werden die Container gestoppt.
 
 ```bash
 sudo docker compose up
