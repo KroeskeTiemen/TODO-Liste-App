@@ -107,4 +107,5 @@ def delete_list(list_id):
     del todo_lists[list_id]
     return jsonify({"message": "Entry deleted"}), 204
 
-app.run(debug=True)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)

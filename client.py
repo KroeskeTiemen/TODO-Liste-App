@@ -1,9 +1,10 @@
 from flask import Flask, render_template, request, redirect
 import requests
+import os
 
 app = Flask(__name__)
 
-API_BASE = "http://127.0.0.1:5000"
+API_BASE = os.environ.get("API_BASE", "http://192.168.24.103:5000")
 
 
 @app.route("/")
@@ -49,4 +50,4 @@ def delete_list(list_id):
 
 
 if __name__ == "__main__":
-    app.run(port=5001, debug=True)
+    app.run(host="0.0.0.0", port=5001)
